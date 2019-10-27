@@ -1,0 +1,69 @@
+import argparse
+
+
+def add_trailing_slash(path):
+    if path[-1] != "/":
+        return path + "/"
+    else:
+        return path
+
+
+def get_args():
+    parser = argparse.ArgumentParser(description="Sonic's reinforcement learning")
+
+    parser.add_argument(
+        "--timesteps",
+        type=int,
+        default=int(1e6),
+        help="number of frames to train (default: 1e6)",
+    )
+
+    parser.add_argument(
+        "--game",
+        default="SonicTheHedgehog-Genesis",
+        help="game to train on (default: SonicTheHedgehog-Genesis)",
+    )
+
+    parser.add_argument(
+        "--level",
+        default="GreenHillZone.Act1",
+        help="lebel to train on (default: GreenHillZone.Act1)",
+    )
+
+    parser.add_argument(
+        "--num-processes",
+        type=int,
+        default=4,
+        help="how many training CPU processes to use (default: 4)",
+    )
+
+    parser.add_argument(
+        "--save-dir",
+        default="./models/",
+        help="directory to save agent checkpoints (default: ./models/)",
+    )
+
+    parser.add_argument(
+        "--logs-dir",
+        default="./logs/",
+        help="directory to save tensorboard logs (default: ./logs/)",
+    )
+    
+    parser.add_argument(
+        "--full-set",
+        type=bool,
+        default=False,
+        help="train on the full test set"
+    )
+    
+    parser.add_argument(
+        "--load-model",
+        help="path of the model to load"
+    )
+
+    args = parser.parse_args()
+
+    args.save_dir = add_trailing_slash(args.save_dir)
+    args.logs_dir = add_trailing_slash(args.logs_dir)
+
+    return args
