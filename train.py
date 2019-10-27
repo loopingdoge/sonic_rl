@@ -15,7 +15,7 @@ import numpy as np
 
 from stable_baselines.common.policies import CnnPolicy
 from stable_baselines.common.vec_env import DummyVecEnv, VecFrameStack, SubprocVecEnv
-from stable_baselines import PPO2
+from stable_baselines import PPO2, A2C, PPO1
 from stable_baselines.results_plotter import load_results, ts2xy
 
 from sonic_util import make_env
@@ -83,6 +83,7 @@ def main():
     logs_path = adjust_logs_folder_path(args.logs_dir + train_id + "/")
     is_joint = args.joint
     load_model = args.load_model
+    algo_name = args.algo
 
     print("\n\n===============================================================")
     print("Num CPU:\t\t", num_cpu)
@@ -116,13 +117,22 @@ def main():
         env = DummyVecEnv(envs)
 
     print("\n\n")
+
+    algo = None
+    if algo_name == 'ppo2':
+        algo = PPO2
+    elif algo_name == 'a2c':
+        algo = A2C
+    elif algo_name == 'ppo':
+        algo = PPO1 # Doesn't work
+
     model = None
     if load_model:
         print("Loading...")
-        model = PPO2.load(load_model, env=env, tensorboard_log=logs_path)
+        model = algo.load(load_model, env=env, tensorboard_log=logs_path)
     else:
         print("New model...")
-        model = PPO2(CnnPolicy, env, verbose=1, tensorboard_log=logs_path)
+        model = algo(CnnPolicy, env, verbose=1, tensorboard_log=logs_path)
 
     model.learn(total_timesteps=train_timesteps, callback=callback)
 

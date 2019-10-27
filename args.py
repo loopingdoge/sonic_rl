@@ -63,6 +63,12 @@ def get_args():
     
     parser.add_argument('train_id', help="training id (used for the logs' name)")
 
+    parser.add_argument(
+        "--algo",
+        default="ppo2",
+        help="algorithm to use: a2c | ppo | ppo2"
+    )
+
     args = parser.parse_args()
 
     args.save_dir = add_trailing_slash(args.save_dir)
