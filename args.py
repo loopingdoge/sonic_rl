@@ -50,8 +50,8 @@ def get_args():
     )
     
     parser.add_argument(
-        "--full-set",
-        type=bool,
+        "--joint",
+        action='store_true',
         default=False,
         help="train on the full test set"
     )
@@ -60,6 +60,8 @@ def get_args():
         "--load-model",
         help="path of the model to load"
     )
+    
+    parser.add_argument('train_id', help="training id (used for the logs' name)")
 
     args = parser.parse_args()
 

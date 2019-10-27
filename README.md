@@ -21,7 +21,7 @@ optional arguments:
   --save-dir SAVE_DIR   directory to save agent checkpoints (default:
                         ./models/)
   --logs-dir LOGS_DIR   directory to save tensorboard logs (default: ./logs/)
-  --full-set FULL_SET   train on the full test set
+  --joint               joint training on the full train set
   --load-model LOAD_MODEL
                         path of the model to load
 

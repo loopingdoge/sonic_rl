@@ -55,18 +55,33 @@ def callback(_locals, _globals):
     return True
 
 
+def adjust_logs_folder_path(logs_dir, id=-1):
+    if id == -1:
+        # First call, id is not set
+        if os.path.exists(logs_dir):
+            return adjust_logs_folder_path(logs_dir, id=0)
+        else:
+            return logs_dir
+    else:
+        # The folder aleady exists, we need to increment the id until we find a free one
+        if os.path.exists(logs_dir[:-1] + "_" + str(id)):
+            return adjust_logs_folder_path(logs_dir, id=id+1)
+        else:
+            return logs_dir[:-1] + "_" + str(id) + "/"
+
 def main():
     global logs_path
     
     args = get_args()
 
+    train_id = args.train_id
     num_cpu = args.num_processes
     train_timesteps = args.timesteps
     game = args.game
     level = args.level
     model_save_path = args.save_dir + level + "/"
-    logs_path = args.logs_dir + level + "/"
-    is_full_set = args.full_set
+    logs_path = adjust_logs_folder_path(args.logs_dir + train_id + "/")
+    is_joint = args.joint
     load_model = args.load_model
 
     print("\n\n===============================================================")
@@ -74,7 +89,7 @@ def main():
     print("Train timesteps:\t", train_timesteps)
     print("Model save path:\t", model_save_path)
     print("Logs path:\t\t", logs_path)
-    if not is_full_set:
+    if not is_joint:
         print("Game:\t\t\t", game)
         print("Level:\t\t\t", level)
     else:
@@ -85,11 +100,16 @@ def main():
         print("Creating new model")
     print("===============================================================\n\n")
 
-    envs = [
-        make_env(game=game, level=level, rank=i, log_dir=logs_path)
-        for i in range(num_cpu)
-    ]
-
+    envs = []
+    if is_joint:
+        for i, (game, level) in enumerate(train_set):
+            envs.append(make_env(game=game, level=level, rank=i, log_dir=logs_path))
+    else:
+        envs = [
+            make_env(game=game, level=level, rank=i, log_dir=logs_path)
+            for i in range(num_cpu)
+        ]
+    
     if num_cpu > 1:
         env = SubprocVecEnv(envs)
     else:
