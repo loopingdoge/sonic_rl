@@ -26,3 +26,30 @@ optional arguments:
                         path of the model to load
 
 ```
+
+## Setup
+
+```
+pip install tensorflow-gpu==1.14
+pip install stable_baselines[mpi]
+pip install gym-retro
+
+git clone --recursive https://github.com/openai/retro-contest.git
+pip install -e "retro-contest/support[docker,rest]"
+
+
+git clone https://github.com/openai/baselines.git
+pip install -e "baselines"
+```
+
+Import your games using:
+```
+python -m retro.import.sega_classics
+```
+
+## Visualize
+
+```
+pip install tensorboard
+tensorboard --logdir path/to/log/foler
+```
