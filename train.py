@@ -23,6 +23,7 @@ from args import get_args
 from levels import train_set, test_set
 
 best_mean_reward, n_steps = -np.inf, 0
+logs_path = ""
 
 def callback(_locals, _globals):
     """
@@ -31,7 +32,6 @@ def callback(_locals, _globals):
     :param _globals: (dict)
     """
     global n_steps, best_mean_reward
-
     # Print stats every 100 calls
     if (n_steps + 1) % 100 == 0:
         # Evaluate policy training performance
@@ -56,6 +56,8 @@ def callback(_locals, _globals):
 
 
 def main():
+    global logs_path
+    
     args = get_args()
 
     num_cpu = args.num_processes
