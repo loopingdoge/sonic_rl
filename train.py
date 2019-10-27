@@ -20,7 +20,7 @@ from stable_baselines.results_plotter import load_results, ts2xy
 
 from sonic_util import make_env
 from args import get_args
-from levels import train_set, test_set
+from levels import small_train_set, train_set, test_set
 
 best_mean_reward, n_steps = -np.inf, 0
 logs_path = ""
@@ -102,7 +102,7 @@ def main():
 
     envs = []
     if is_joint:
-        for i, (game, level) in enumerate(train_set):
+        for i, (game, level) in enumerate(small_train_set):
             envs.append(make_env(game=game, level=level, rank=i, log_dir=logs_path))
     else:
         envs = [

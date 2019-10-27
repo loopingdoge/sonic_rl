@@ -48,22 +48,35 @@ train_set = [
     ("SonicAndKnuckles3-Genesis", "LaunchBaseZone.Act1"),
 ]
 
-test_set = {
-    "SonicAndKnuckles3-Genesis": [
-        "AngelIslandZone.Act2",
-        "FlyingBatteryZone.Act2",
-        "HydrocityZone.Act1",
-        "LavaReefZone.Act1",
-    ],
-    "SonicTheHedgehog2-Genesis": [
-        "CasinoNightZone.Act2",
-        "HillTopZone.Act2",
-        "MetropolisZone.Act3",
-    ],
-    "SonicTheHedgehog-Genesis": [
-        "GreenHillZone.Act2",
-        "ScrapBrainZone.Act1",
-        "SpringYardZone.Act1",
-        "StarLightZone.Act3",
-    ],
-}
+small_train_set = [
+    ("SonicTheHedgehog-Genesis", "SpringYardZone.Act3"),
+    ("SonicTheHedgehog-Genesis", "SpringYardZone.Act2"),
+    ("SonicTheHedgehog-Genesis", "GreenHillZone.Act3"),
+    ("SonicTheHedgehog-Genesis", "GreenHillZone.Act1"),
+    ("SonicTheHedgehog-Genesis", "StarLightZone.Act2"),
+    ("SonicTheHedgehog-Genesis", "StarLightZone.Act1"),
+    ("SonicTheHedgehog-Genesis", "ScrapBrainZone.Act2"),
+    ("SonicTheHedgehog2-Genesis", "MetropolisZone.Act1"),
+    ("SonicTheHedgehog2-Genesis", "MetropolisZone.Act2"),
+    ("SonicTheHedgehog2-Genesis", "HillTopZone.Act1"),
+    ("SonicTheHedgehog2-Genesis", "CasinoNightZone.Act1"),
+    ("SonicAndKnuckles3-Genesis", "LavaReefZone.Act2"),
+    ("SonicAndKnuckles3-Genesis", "FlyingBatteryZone.Act1"),
+    ("SonicAndKnuckles3-Genesis", "HydrocityZone.Act2"),
+    ("SonicAndKnuckles3-Genesis", "AngelIslandZone.Act1"),
+]
+
+test_set = [
+    ("SonicAndKnuckles3-Genesis", "AngelIslandZone.Act2"),
+    ("SonicAndKnuckles3-Genesis", "FlyingBatteryZone.Act2"),
+    ("SonicAndKnuckles3-Genesis", "HydrocityZone.Act1"),
+    ("SonicAndKnuckles3-Genesis", "LavaReefZone.Act1"),
+    ("SonicTheHedgehog2-Genesis", "CasinoNightZone.Act2"),
+    ("SonicTheHedgehog2-Genesis", "HillTopZone.Act2"),
+    ("SonicTheHedgehog2-Genesis", "MetropolisZone.Act3"),
+    ("SonicTheHedgehog-Genesis", "GreenHillZone.Act2"),
+    ("SonicTheHedgehog-Genesis", "ScrapBrainZone.Act1"),
+    ("SonicTheHedgehog-Genesis", "SpringYardZone.Act1"),
+    ("SonicTheHedgehog-Genesis", "StarLightZone.Act3"),
+]
+
