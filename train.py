@@ -1,17 +1,24 @@
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 import warnings
-with warnings.catch_warnings():  
-    warnings.filterwarnings("ignore",category=FutureWarning)
+
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=FutureWarning)
 
     import tensorflow.python.util.deprecation as deprecation
+
     deprecation._PRINT_DEPRECATION_WARNINGS = False
 
     import tensorflow as tf
+
     tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+from scipy.interpolate import make_interp_spline, BSpline
 
 from stable_baselines.common.policies import CnnPolicy, CnnLstmPolicy
 from stable_baselines.common.vec_env import DummyVecEnv, VecFrameStack, SubprocVecEnv
@@ -24,6 +31,7 @@ from levels import small_train_set, train_set, test_set
 
 best_mean_reward, n_steps = -np.inf, 0
 logs_path = ""
+
 
 def callback(_locals, _globals):
     """
@@ -65,13 +73,27 @@ def adjust_logs_folder_path(logs_dir, id=-1):
     else:
         # The folder aleady exists, we need to increment the id until we find a free one
         if os.path.exists(logs_dir[:-1] + "_" + str(id)):
-            return adjust_logs_folder_path(logs_dir, id=id+1)
+            return adjust_logs_folder_path(logs_dir, id=id + 1)
         else:
             return logs_dir[:-1] + "_" + str(id) + "/"
 
+
+def save_plot(x_values, y_values, title, save_path):
+    fig, ax = plt.subplots()
+    if len(x_values) > 0:
+        ax.set(xlabel="Timesteps", ylabel="Score", title=title)
+        ax.grid()
+
+        poly = np.polyfit(x_values, y_values, 5)
+        poly_y = np.poly1d(poly)(x_values)
+        plt.plot(x_values, poly_y)
+
+        fig.savefig(save_path)
+
+
 def main():
     global logs_path
-    
+
     args = get_args()
 
     train_id = args.train_id
@@ -111,7 +133,7 @@ def main():
             make_env(game=game, level=level, rank=i, log_dir=logs_path)
             for i in range(num_cpu)
         ]
-    
+
     if num_cpu > 1:
         env = SubprocVecEnv(envs)
     else:
@@ -126,12 +148,12 @@ def main():
         algo = A2C
 
     policy = None
-    nminibatches  = 4
+    nminibatches = 4
     if policy_name == "cnn":
         policy = CnnPolicy
     elif policy_name == "cnnlstm":
         if is_joint:
-            nminibatches  = 5
+            nminibatches = 5
         policy = CnnLstmPolicy
 
     model = None
@@ -140,12 +162,25 @@ def main():
         model = algo.load(load_model, env=env, tensorboard_log=logs_path)
     else:
         print("New model...")
-        model = algo(policy, env, nminibatches=nminibatches, verbose=1, tensorboard_log=logs_path)
+        model = algo(
+            policy, env, nminibatches=nminibatches, verbose=1, tensorboard_log=logs_path
+        )
 
     model.learn(total_timesteps=train_timesteps, callback=callback)
 
     model.save(model_save_path)
     print("Model saved in:\t", model_save_path)
+
+    timestep_values, score_values = ts2xy(load_results(logs_path), "timesteps")
+    plot_path = os.path.join(logs_path, f"{level}.png")
+    print("Saving the plot in: " + plot_path)
+    save_plot(
+        timestep_values,
+        score_values,
+        title=level,
+        save_path=plot_path,
+    )
+
 
 if __name__ == "__main__":
     main()
