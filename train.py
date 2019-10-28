@@ -13,7 +13,7 @@ with warnings.catch_warnings():
 
 import numpy as np
 
-from stable_baselines.common.policies import CnnPolicy
+from stable_baselines.common.policies import CnnPolicy, CnnLstmPolicy
 from stable_baselines.common.vec_env import DummyVecEnv, VecFrameStack, SubprocVecEnv
 from stable_baselines import PPO2, A2C
 from stable_baselines.results_plotter import load_results, ts2xy
@@ -84,6 +84,7 @@ def main():
     is_joint = args.joint
     load_model = args.load_model
     algo_name = args.algo
+    policy_name = args.policy
 
     print("\n\n===============================================================")
     print("Num CPU:\t\t", num_cpu)
@@ -119,10 +120,19 @@ def main():
     print("\n\n")
 
     algo = None
-    if algo_name == 'ppo2':
+    if algo_name == "ppo2":
         algo = PPO2
-    elif algo_name == 'a2c':
+    elif algo_name == "a2c":
         algo = A2C
+
+    policy = None
+    nminibatches  = 4
+    if policy_name == "cnn":
+        policy = CnnPolicy
+    elif policy_name == "cnnlstm":
+        if is_joint:
+            nminibatches  = 5
+        policy = CnnLstmPolicy
 
     model = None
     if load_model:
@@ -130,7 +140,7 @@ def main():
         model = algo.load(load_model, env=env, tensorboard_log=logs_path)
     else:
         print("New model...")
-        model = algo(CnnPolicy, env, verbose=1, tensorboard_log=logs_path)
+        model = algo(policy, env, nminibatches=nminibatches, verbose=1, tensorboard_log=logs_path)
 
     model.learn(total_timesteps=train_timesteps, callback=callback)
 

@@ -51,5 +51,5 @@ python -m retro.import.sega_classics
 
 ```
 pip install tensorboard
-tensorboard --logdir path/to/log/foler
+tensorboard --logdir path/to/log/folder
 ```
