@@ -15,9 +15,8 @@ with warnings.catch_warnings():
 
     tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
-import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
+    import numpy as np
+
 from scipy.interpolate import make_interp_spline, BSpline
 
 from stable_baselines.common.policies import CnnPolicy, CnnLstmPolicy
@@ -28,6 +27,7 @@ from stable_baselines.results_plotter import load_results, ts2xy
 from sonic_util import make_env
 from args import get_args
 from levels import small_train_set, train_set, test_set
+from utils import save_plot, check_subfolder_availability
 
 best_mean_reward, n_steps = -np.inf, 0
 logs_path = ""
@@ -63,77 +63,29 @@ def callback(_locals, _globals):
     return True
 
 
-def adjust_logs_folder_path(logs_dir, id=-1):
-    if id == -1:
-        # First call, id is not set
-        if os.path.exists(logs_dir):
-            return adjust_logs_folder_path(logs_dir, id=0)
-        else:
-            return logs_dir
-    else:
-        # The folder aleady exists, we need to increment the id until we find a free one
-        if os.path.exists(logs_dir[:-1] + "_" + str(id)):
-            return adjust_logs_folder_path(logs_dir, id=id + 1)
-        else:
-            return logs_dir[:-1] + "_" + str(id) + "/"
-
-
-def save_plot(x_values, y_values, title, save_path):
-    fig, ax = plt.subplots()
-    if len(x_values) > 0:
-        ax.set(xlabel="Timesteps", ylabel="Score", title=title)
-        ax.grid()
-
-        poly = np.polyfit(x_values, y_values, 5)
-        poly_y = np.poly1d(poly)(x_values)
-        plt.plot(x_values, poly_y)
-
-        fig.savefig(save_path)
-
-
-def main():
-    global logs_path
-
-    args = get_args()
-
-    train_id = args.train_id
-    num_cpu = args.num_processes
-    train_timesteps = args.timesteps
-    game = args.game
-    level = args.level
-    model_save_path = args.save_dir + train_id + ".pkl"
-    logs_path = adjust_logs_folder_path(args.logs_dir + train_id + "/")
-    is_joint = args.joint
-    load_model_path = args.load_model
-    algo_name = args.algo
-    policy_name = args.policy
-
-    print("\n\n===============================================================")
-    print("Num CPU:\t\t", num_cpu)
-    print("Train timesteps:\t", train_timesteps)
-    print("Model save path:\t", model_save_path)
-    print("Logs path:\t\t", logs_path)
-    if not is_joint:
-        print("Game:\t\t\t", game)
-        print("Level:\t\t\t", level)
-    else:
-        print("Joint Training")
-    if load_model_path:
-        print("Loading model:\t\t", load_model_path)
-    else:
-        print("Creating new model")
-    print("===============================================================\n\n")
-
+def train(
+    train_id,
+    game,
+    level,
+    num_processes,
+    num_timesteps,
+    algo_name,
+    policy_name,
+    is_joint,
+    model_save_path,
+    logs_path,
+    load_model_path=None,
+):
     envs = []
     if is_joint:
         envs = [
-            make_env(game=game, level=level, rank=i, log_dir=logs_path)
+            make_env(game=game, level=level, rank=i, log_dir=logs_path, seed=i * 100)
             for i, (game, level) in enumerate(small_train_set)
         ]
     else:
         envs = [
-            make_env(game=game, level=level, rank=i, log_dir=logs_path)
-            for i in range(num_cpu)
+            make_env(game=game, level=level, rank=i, log_dir=logs_path, seed=i * 100)
+            for i in range(num_processes)
         ]
 
     env = VecFrameStack(SubprocVecEnv(envs), 4)
@@ -165,17 +117,72 @@ def main():
             policy, env, nminibatches=nminibatches, verbose=1, tensorboard_log=logs_path
         )
 
-    print(f"Starting training for {train_timesteps} timesteps")
-    model.learn(total_timesteps=train_timesteps, callback=callback)
+    print(f"Starting training for {num_timesteps} timesteps")
+    model.learn(total_timesteps=num_timesteps, callback=callback)
     print("Training finished!")
 
-    model.save(model_save_path)
-    print("Model saved in:\t", model_save_path)
+    if model_save_path:
+        model.save(model_save_path)
+        print("Model saved in:\t", model_save_path)
 
     timestep_values, score_values = ts2xy(load_results(logs_path), "timesteps")
+    score_values = score_values * 100
+    
     plot_path = os.path.join(logs_path, f"{level}.png")
     print("Saving the plot in: " + plot_path)
     save_plot(timestep_values, score_values, title=level, save_path=plot_path)
+
+    env.close()
+
+
+def main():
+    global logs_path
+
+    args = get_args()
+
+    train_id = args.train_id
+    num_processes = args.num_processes
+    num_timesteps = args.timesteps
+    game = args.game
+    level = args.level
+    model_save_path = args.save_dir + train_id + ".pkl"
+    logs_path = os.path.join(
+        args.logs_dir, check_subfolder_availability(args.logs_dir, train_id)
+    )
+    is_joint = args.joint
+    load_model_path = args.load_model
+    algo_name = args.algo
+    policy_name = args.policy
+
+    print("\n\n===============================================================")
+    print("Num processes:\t\t", num_processes)
+    print("Train timesteps:\t", num_timesteps)
+    print("Model save path:\t", model_save_path)
+    print("Logs path:\t\t", logs_path)
+    if not is_joint:
+        print("Game:\t\t\t", game)
+        print("Level:\t\t\t", level)
+    else:
+        print("Joint Training")
+    if load_model_path:
+        print("Loading model:\t\t", load_model_path)
+    else:
+        print("Creating new model")
+    print("===============================================================\n\n")
+
+    train(
+        train_id=train_id,
+        game=game,
+        level=level,
+        num_processes=num_processes,
+        num_timesteps=num_timesteps,
+        algo_name=algo_name,
+        policy_name=policy_name,
+        is_joint=is_joint,
+        model_save_path=model_save_path,
+        load_model_path=load_model_path,
+        logs_path=logs_path,
+    )
 
 
 if __name__ == "__main__":
