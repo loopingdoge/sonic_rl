@@ -104,7 +104,7 @@ def main():
     model_save_path = args.save_dir + train_id + ".pkl"
     logs_path = adjust_logs_folder_path(args.logs_dir + train_id + "/")
     is_joint = args.joint
-    load_model = args.load_model
+    load_model_path = args.load_model
     algo_name = args.algo
     policy_name = args.policy
 
@@ -117,9 +117,9 @@ def main():
         print("Game:\t\t\t", game)
         print("Level:\t\t\t", level)
     else:
-        print("Testing full set")
-    if load_model:
-        print("Loading model:\t\t", load_model)
+        print("Joint Training")
+    if load_model_path:
+        print("Loading model:\t\t", load_model_path)
     else:
         print("Creating new model")
     print("===============================================================\n\n")
@@ -157,17 +157,19 @@ def main():
         policy = CnnLstmPolicy
 
     model = None
-    if load_model:
-        print("Loading...")
-        model = algo.load(load_model, env=env, tensorboard_log=logs_path)
+    if load_model_path:
+        print("Loading a model...")
+        model = algo.load(load_model_path, env=env, tensorboard_log=logs_path)
     else:
-        print("New model...")
+        print("Creating a new model...")
         model = algo(
             policy, env, nminibatches=nminibatches, verbose=1, tensorboard_log=logs_path
         )
 
+    print(f"Starting training for {train_timesteps} timesteps")
     model.learn(total_timesteps=train_timesteps, callback=callback)
-
+    print("Training finished!")
+    
     model.save(model_save_path)
     print("Model saved in:\t", model_save_path)
 
