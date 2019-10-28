@@ -30,7 +30,7 @@ from levels import small_train_set, train_set, test_set
 from utils import save_plot, check_subfolder_availability
 
 best_mean_reward, n_steps = -np.inf, 0
-logs_path = ""
+global_logs_path = ""
 
 
 def callback(_locals, _globals):
@@ -43,7 +43,7 @@ def callback(_locals, _globals):
     # Print stats every 100 calls
     if (n_steps + 1) % 100 == 0:
         # Evaluate policy training performance
-        x, y = ts2xy(load_results(logs_path), "timesteps")
+        x, y = ts2xy(load_results(global_logs_path), "timesteps")
         if len(x) > 0:
             mean_reward = np.mean(y[-10:])
             print(x[-1], "timesteps")
@@ -58,7 +58,7 @@ def callback(_locals, _globals):
                 best_mean_reward = mean_reward
                 # Example for saving best model
                 print("Saving new best model")
-                _locals["self"].save(logs_path + "best_model.pkl")
+                _locals["self"].save(global_logs_path + "best_model.pkl")
     n_steps += 1
     return True
 
@@ -76,6 +76,8 @@ def train(
     logs_path,
     load_model_path=None,
 ):
+    global global_logs_path
+    global_logs_path = logs_path
     envs = []
     if is_joint:
         envs = [
