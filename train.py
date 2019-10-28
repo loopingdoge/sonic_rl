@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import make_interp_spline, BSpline
 
 from stable_baselines.common.policies import CnnPolicy, CnnLstmPolicy
-from stable_baselines.common.vec_env import DummyVecEnv, VecFrameStack, SubprocVecEnv
+from stable_baselines.common.vec_env import VecFrameStack, SubprocVecEnv
 from stable_baselines import PPO2, A2C
 from stable_baselines.results_plotter import load_results, ts2xy
 
@@ -136,10 +136,7 @@ def main():
             for i in range(num_cpu)
         ]
 
-    if num_cpu > 1:
-        env = SubprocVecEnv(envs)
-    else:
-        env = DummyVecEnv(envs)
+    env = SubprocVecEnv(envs)
 
     print("\n\n")
 
