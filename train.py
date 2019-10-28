@@ -15,7 +15,7 @@ import numpy as np
 
 from stable_baselines.common.policies import CnnPolicy
 from stable_baselines.common.vec_env import DummyVecEnv, VecFrameStack, SubprocVecEnv
-from stable_baselines import PPO2, A2C, PPO1
+from stable_baselines import PPO2, A2C
 from stable_baselines.results_plotter import load_results, ts2xy
 
 from sonic_util import make_env
@@ -79,7 +79,7 @@ def main():
     train_timesteps = args.timesteps
     game = args.game
     level = args.level
-    model_save_path = args.save_dir + level + "/"
+    model_save_path = args.save_dir + train_id + ".pkl"
     logs_path = adjust_logs_folder_path(args.logs_dir + train_id + "/")
     is_joint = args.joint
     load_model = args.load_model
@@ -123,8 +123,6 @@ def main():
         algo = PPO2
     elif algo_name == 'a2c':
         algo = A2C
-    elif algo_name == 'ppo':
-        algo = PPO1 # Doesn't work
 
     model = None
     if load_model:
