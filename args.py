@@ -53,9 +53,9 @@ def get_args():
         "--joint",
         action='store_true',
         default=False,
-        help="train on the full test set"
+        help="train on the full train set"
     )
-    
+
     parser.add_argument(
         "--load-model",
         help="path of the model to load"

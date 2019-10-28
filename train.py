@@ -145,7 +145,7 @@ def main():
     model.learn(total_timesteps=train_timesteps, callback=callback)
 
     model.save(model_save_path)
-
+    print("Model saved in:\t", model_save_path)
 
 if __name__ == "__main__":
     main()
