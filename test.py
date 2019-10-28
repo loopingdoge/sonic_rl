@@ -31,7 +31,9 @@ def mcd_id(model_save_path, logs_path, test_id):
         return mcd_id(model_save_path, logs_path, mcid)
 
 
-def test(test_id, load_model_path, model_save_basedir, logs_dir, timesteps, algo, policy):
+def test(
+    test_id, load_model_path, model_save_basedir, logs_dir, timesteps, algo, policy
+):
     scores = []
 
     for (game, level) in test_set:
@@ -56,10 +58,10 @@ def test(test_id, load_model_path, model_save_basedir, logs_dir, timesteps, algo
         _, score_values = ts2xy(load_results(logs_path), "timesteps")
         mean_score = round(score_values.mean() * 100, 2)
         scores.append(mean_score)
-        
+
         print("Mean Score: ", mean_score)
-        with open(os.path.join(logs_path, 'score.txt'), 'a') as f:
-            f.write(f'{mean_score}\n')
+        with open(os.path.join(logs_path, "score.txt"), "a") as f:
+            f.write(f"{mean_score}\n")
 
     final_score = round(np.array(scores).mean(), 2)
     return final_score
@@ -87,32 +89,32 @@ if __name__ == "__main__":
         help="directory to save tensorboard logs (default: ./logs/)",
     )
     parser.add_argument("--load-model", help="path of the model to load")
+    parser.add_argument("--algo", default="ppo2", help="algorithm to use: a2c | ppo2")
     parser.add_argument(
-        "--algo",
-        default="ppo2",
-        help="algorithm to use: a2c | ppo2"
-    )
-    parser.add_argument(
-        "--policy",
-        default="cnn",
-        help="algorithm to use: cnn | cnnlstm"
+        "--policy", default="cnn", help="algorithm to use: cnn | cnnlstm"
     )
     parser.add_argument("test_id", help="test id (used for the logs' name)")
 
     args = parser.parse_args()
-    
+
     # Find a unique ID
     new_test_id = mcd_id(args.save_dir, args.logs_dir, args.test_id)
     logs_dir = os.path.join(args.logs_dir, new_test_id)
     model_save_dir = os.path.join(args.save_dir, new_test_id)
-    
+
     if not os.path.exists(model_save_dir):
         os.makedirs(model_save_dir)
-    
+
     score = test(
-        args.test_id, args.load_model, model_save_dir, logs_dir, args.timesteps
+        args.test_id,
+        args.load_model,
+        model_save_dir,
+        logs_dir,
+        args.timesteps,
+        args.algo,
+        args.policy,
     )
     print("\n\nFinal Score: ", score)
-    
-    with open(os.path.join(logs_dir, 'final_score.txt'), 'a') as f:
-        f.write(f'{score}\n')
+    with open(os.path.join(logs_dir, "final_score.txt"), "a") as f:
+        f.write(f"{score}\n")
+
