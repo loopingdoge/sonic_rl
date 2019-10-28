@@ -126,8 +126,10 @@ def main():
 
     envs = []
     if is_joint:
-        for i, (game, level) in enumerate(small_train_set):
-            envs.append(make_env(game=game, level=level, rank=i, log_dir=logs_path))
+        envs = [
+            make_env(game=game, level=level, rank=i, log_dir=logs_path)
+            for i, (game, level) in enumerate(small_train_set)
+        ]
     else:
         envs = [
             make_env(game=game, level=level, rank=i, log_dir=logs_path)
@@ -169,19 +171,14 @@ def main():
     print(f"Starting training for {train_timesteps} timesteps")
     model.learn(total_timesteps=train_timesteps, callback=callback)
     print("Training finished!")
-    
+
     model.save(model_save_path)
     print("Model saved in:\t", model_save_path)
 
     timestep_values, score_values = ts2xy(load_results(logs_path), "timesteps")
     plot_path = os.path.join(logs_path, f"{level}.png")
     print("Saving the plot in: " + plot_path)
-    save_plot(
-        timestep_values,
-        score_values,
-        title=level,
-        save_path=plot_path,
-    )
+    save_plot(timestep_values, score_values, title=level, save_path=plot_path)
 
 
 if __name__ == "__main__":
