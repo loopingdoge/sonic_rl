@@ -66,7 +66,13 @@ def get_args():
     parser.add_argument(
         "--algo",
         default="ppo2",
-        help="algorithm to use: a2c | ppo | ppo2"
+        help="algorithm to use: a2c | ppo2"
+    )
+
+    parser.add_argument(
+        "--policy",
+        default="cnn",
+        help="algorithm to use: cnn | cnnlstm"
     )
 
     args = parser.parse_args()
