@@ -13,13 +13,13 @@ from math import floor
 from random import randrange
 
 from retro_contest.local import make
-from baselines.common.atari_wrappers import WarpFrame, FrameStack
+from baselines.common.atari_wrappers import WarpFrame
 from stable_baselines.common import set_global_seeds
 from stable_baselines.bench import Monitor
 import gym_remote.client as grc
 
 
-def make_sonic_env(game, state, remote_env=False, stack=True, scale_rew=True, video_dir=''):
+def make_sonic_env(game, state, remote_env=False, scale_rew=True, video_dir=''):
     """
     Create an environment with some standard wrappers.
     """
@@ -33,8 +33,8 @@ def make_sonic_env(game, state, remote_env=False, stack=True, scale_rew=True, vi
     if scale_rew:
         env = RewardScaler(env)
     env = WarpFrame(env)
-    if stack:
-        env = FrameStack(env, 4)
+    # if stack:
+    #     env = FrameStack(env, 4)
     env = ShortLife(env)
     env = AllowBacktracking(env)
     return env

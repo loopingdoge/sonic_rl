@@ -136,7 +136,7 @@ def main():
             for i in range(num_cpu)
         ]
 
-    env = SubprocVecEnv(envs)
+    env = VecFrameStack(SubprocVecEnv(envs), 4)
 
     print("\n\n")
 
