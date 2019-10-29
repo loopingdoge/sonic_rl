@@ -12,6 +12,7 @@ from stable_baselines.results_plotter import load_results, ts2xy
 from levels import test_set
 from train import train
 from utils import check_subfolder_availability
+from args import get_test_args
 
 
 def mcd_id(model_save_path, logs_path, test_id):
@@ -32,7 +33,7 @@ def mcd_id(model_save_path, logs_path, test_id):
 
 
 def test(
-    test_id, load_model_path, model_save_basedir, logs_dir, timesteps, algo, policy
+    test_id, load_model_path, model_save_basedir, logs_dir, timesteps, algo, policy, num_processes
 ):
     scores = []
 
@@ -45,7 +46,7 @@ def test(
             train_id=test_id,
             game=game,
             level=level,
-            num_processes=4,
+            num_processes=num_processes,
             num_timesteps=timesteps,
             algo_name=algo,
             policy_name=policy,
@@ -68,34 +69,7 @@ def test(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Sonic's reinforcement learning testing suite"
-    )
-
-    parser.add_argument(
-        "--timesteps",
-        type=int,
-        default=int(1e6),
-        help="number of frames to train (default: 1e6)",
-    )
-    parser.add_argument(
-        "--save-dir",
-        default="./models/",
-        help="directory to save agent checkpoints (default: ./models/)",
-    )
-    parser.add_argument(
-        "--logs-dir",
-        default="./logs/",
-        help="directory to save tensorboard logs (default: ./logs/)",
-    )
-    parser.add_argument("--load-model", help="path of the model to load")
-    parser.add_argument("--algo", default="ppo2", help="algorithm to use: a2c | ppo2")
-    parser.add_argument(
-        "--policy", default="cnn", help="algorithm to use: cnn | cnnlstm"
-    )
-    parser.add_argument("test_id", help="test id (used for the logs' name)")
-
-    args = parser.parse_args()
+    args = get_test_args()
 
     # Find a unique ID
     new_test_id = mcd_id(args.save_dir, args.logs_dir, args.test_id)
@@ -113,6 +87,7 @@ if __name__ == "__main__":
         args.timesteps,
         args.algo,
         args.policy,
+        args.num_processes
     )
     print("\n\nFinal Score: ", score)
     with open(os.path.join(logs_dir, "final_score.txt"), "a") as f:

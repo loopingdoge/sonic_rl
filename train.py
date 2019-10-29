@@ -25,7 +25,7 @@ from stable_baselines import PPO2, A2C
 from stable_baselines.results_plotter import load_results, ts2xy
 
 from sonic_util import make_env
-from args import get_args
+from args import get_train_args
 from levels import small_train_set, train_set, test_set
 from utils import save_plot, check_subfolder_availability
 
@@ -147,7 +147,7 @@ def train(
 def main():
     global logs_path
 
-    args = get_args()
+    args = get_train_args()
 
     train_id = args.train_id
     num_processes = args.num_processes
