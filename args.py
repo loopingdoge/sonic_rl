@@ -59,6 +59,13 @@ def common_args(parser):
         default=4,
         help="how many training CPU processes to use (default: 4)",
     )
+    
+    parser.add_argument(
+        "--hyper-opt",
+        action="store_true",
+        default=False,
+        help="set it to use the optimal hyperparameters",
+    )
 
 
 def get_test_args():

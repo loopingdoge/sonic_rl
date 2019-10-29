@@ -33,7 +33,7 @@ def mcd_id(model_save_path, logs_path, test_id):
 
 
 def test(
-    test_id, load_model_path, model_save_basedir, logs_dir, timesteps, algo, policy, num_processes
+    test_id, load_model_path, model_save_basedir, logs_dir, timesteps, algo, policy, num_processes, hyper_opt
 ):
     scores = []
 
@@ -53,6 +53,7 @@ def test(
             is_joint=False,
             model_save_path=model_save_path,
             logs_path=logs_path,
+            hyper_opt=hyper_opt,
             load_model_path=load_model_path,
             train_counter=i
         )
@@ -76,7 +77,7 @@ if __name__ == "__main__":
     new_test_id = mcd_id(args.save_dir, args.logs_dir, args.test_id)
     logs_dir = os.path.join(args.logs_dir, new_test_id)
     model_save_dir = os.path.join(args.save_dir, new_test_id)
-
+    
     if not os.path.exists(model_save_dir):
         os.makedirs(model_save_dir)
 
@@ -88,7 +89,8 @@ if __name__ == "__main__":
         args.timesteps,
         args.algo,
         args.policy,
-        args.num_processes
+        args.num_processes,
+        args.hyper_opt
     )
     print("\n\nFinal Score: ", score)
     with open(os.path.join(logs_dir, "final_score.txt"), "a") as f:

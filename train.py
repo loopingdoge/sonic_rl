@@ -74,8 +74,9 @@ def train(
     is_joint,
     model_save_path,
     logs_path,
+    hyper_opt,
     load_model_path=None,
-    train_counter=0, # To be set (incrementally) when running multiple trainings
+    train_counter=0 # To be set (incrementally) when running multiple trainings
 ):
     global global_logs_path
     global_logs_path = logs_path
@@ -129,13 +130,25 @@ def train(
     else:
         print("Creating a new model...")
         if algo_name == "ppo2":
-            model = PPO2(
-                policy,
-                env,
-                nminibatches=nminibatches,
-                verbose=1,
-                tensorboard_log=logs_path,
-            )
+            if hyper_opt:
+                model = algo(
+                    policy,
+                    env,
+                    nminibatches=len(envs) * 8,
+                    verbose=1,
+                    tensorboard_log=logs_path,
+                    n_steps=8192,
+                    learning_rate=2e-5,
+                    ent_coef=0.001,
+                )
+            else:
+                model = PPO2(
+                    policy,
+                    env,
+                    nminibatches=nminibatches,
+                    verbose=1,
+                    tensorboard_log=logs_path,
+                )
         elif algo_name == "a2c":
             model = A2C(policy, env, verbose=1, tensorboard_log=logs_path)
 
@@ -204,6 +217,7 @@ def main():
         model_save_path=model_save_path,
         load_model_path=load_model_path,
         logs_path=logs_path,
+        hyper_opt=args.hyper_opt
     )
 
 
