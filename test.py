@@ -37,7 +37,7 @@ def test(
 ):
     scores = []
 
-    for (game, level) in test_set:
+    for i, (game, level) in enumerate(test_set):
         model_save_path = os.path.join(model_save_dir, f"{level}.pkl")
 
         logs_path = os.path.join(logs_dir, level)
@@ -54,6 +54,7 @@ def test(
             model_save_path=model_save_path,
             logs_path=logs_path,
             load_model_path=load_model_path,
+            train_counter=i
         )
 
         _, score_values = ts2xy(load_results(logs_path), "timesteps")

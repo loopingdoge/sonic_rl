@@ -75,18 +75,31 @@ def train(
     model_save_path,
     logs_path,
     load_model_path=None,
+    train_counter=0, # To be set (incrementally) when running multiple trainings
 ):
     global global_logs_path
     global_logs_path = logs_path
     envs = []
     if is_joint:
         envs = [
-            make_env(game=game, level=level, rank=i, log_dir=logs_path, seed=i * 100)
+            make_env(
+                game=game,
+                level=level,
+                rank=i,
+                log_dir=logs_path,
+                seed=train_counter * 100
+            )
             for i, (game, level) in enumerate(small_train_set)
         ]
     else:
         envs = [
-            make_env(game=game, level=level, rank=i, log_dir=logs_path, seed=i * 100)
+            make_env(
+                game=game,
+                level=level,
+                rank=i,
+                log_dir=logs_path,
+                seed=train_counter * 100
+            )
             for i in range(num_processes)
         ]
 
