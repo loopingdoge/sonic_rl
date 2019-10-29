@@ -66,12 +66,14 @@ def get_args():
     parser.add_argument(
         "--algo",
         default="ppo2",
+        choices=['a2c', 'ppo2'],
         help="algorithm to use: a2c | ppo2"
     )
 
     parser.add_argument(
         "--policy",
         default="cnn",
+        choices=['cnn', 'cnnlstm'],
         help="algorithm to use: cnn | cnnlstm"
     )
 
