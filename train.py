@@ -115,9 +115,16 @@ def train(
         model = algo.load(load_model_path, env=env, tensorboard_log=logs_path)
     else:
         print("Creating a new model...")
-        model = algo(
-            policy, env, nminibatches=nminibatches, verbose=1, tensorboard_log=logs_path
-        )
+        if algo_name == "ppo2":
+            model = PPO2(
+                policy,
+                env,
+                nminibatches=nminibatches,
+                verbose=1,
+                tensorboard_log=logs_path,
+            )
+        elif algo_name == "a2c":
+            model = A2C(policy, env, verbose=1, tensorboard_log=logs_path)
 
     print(f"Starting training for {num_timesteps} timesteps")
     model.learn(total_timesteps=num_timesteps, callback=callback)
@@ -129,7 +136,7 @@ def train(
 
     timestep_values, score_values = ts2xy(load_results(logs_path), "timesteps")
     score_values = score_values * 100
-    
+
     plot_path = os.path.join(logs_path, f"{level}.png")
     print("Saving the plot in: " + plot_path)
     save_plot(timestep_values, score_values, title=level, save_path=plot_path)
