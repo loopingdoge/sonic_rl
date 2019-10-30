@@ -19,7 +19,7 @@ from stable_baselines.bench import Monitor
 import gym_remote.client as grc
 
 
-def make_sonic_env(game, state, remote_env=False, scale_rew=True, video_dir=''):
+def make_sonic_env(game, state, remote_env=False, scale_rew=True, video_dir='', short_life=True):
     """
     Create an environment with some standard wrappers.
     """
@@ -35,11 +35,12 @@ def make_sonic_env(game, state, remote_env=False, scale_rew=True, video_dir=''):
     env = WarpFrame(env)
     # if stack:
     #     env = FrameStack(env, 4)
-    # env = ShortLife(env)
+    if short_life:
+        env = ShortLife(env)
     env = AllowBacktracking(env)
     return env
 
-def make_env(game, level, rank=0, seed=0, log_dir=None, wrapper_class=None):
+def make_env(game, level, rank=0, seed=0, log_dir=None, wrapper_class=None, short_life=True):
     """
     Helper function to multiprocess training
     and log the progress.
@@ -56,7 +57,7 @@ def make_env(game, level, rank=0, seed=0, log_dir=None, wrapper_class=None):
     def _init():
         set_global_seeds(seed + rank)
         # env = gym.make(env_id)
-        env = make_sonic_env(game, level)
+        env = make_sonic_env(game, level, short_life=short_life)
 
         # Dict observation space is currently not supported.
         # https://github.com/hill-a/stable-baselines/issues/321

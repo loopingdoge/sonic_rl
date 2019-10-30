@@ -66,6 +66,13 @@ def common_args(parser):
         default=False,
         help="set it to use the optimal hyperparameters",
     )
+    
+    parser.add_argument(
+        "--no-short-life",
+        action="store_true",
+        default=False,
+        help="whether or not to use ShortLife wrapper"
+    )
 
 
 def get_test_args():

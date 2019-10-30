@@ -76,7 +76,8 @@ def train(
     logs_path,
     hyper_opt,
     load_model_path=None,
-    train_counter=0 # To be set (incrementally) when running multiple trainings
+    train_counter=0,  # To be set (incrementally) when running multiple trainings
+    short_life=True,
 ):
     global global_logs_path, best_mean_reward, n_steps
     global_logs_path = logs_path
@@ -89,7 +90,8 @@ def train(
                 level=level,
                 rank=i,
                 log_dir=logs_path,
-                seed=train_counter * 100
+                seed=train_counter * 100,
+                short_life=short_life
             )
             for i, (game, level) in enumerate(small_train_set)
         ]
@@ -100,7 +102,8 @@ def train(
                 level=level,
                 rank=i,
                 log_dir=logs_path,
-                seed=train_counter * 100
+                seed=train_counter * 100,
+                short_life=short_life
             )
             for i in range(num_processes)
         ]
@@ -218,7 +221,8 @@ def main():
         model_save_path=model_save_path,
         load_model_path=load_model_path,
         logs_path=logs_path,
-        hyper_opt=args.hyper_opt
+        hyper_opt=args.hyper_opt,
+        short_life=not args.no_short_life,
     )
 
 

@@ -33,7 +33,7 @@ def mcd_id(model_save_path, logs_path, test_id):
 
 
 def test(
-    test_id, load_model_path, model_save_basedir, logs_dir, timesteps, algo, policy, num_processes, hyper_opt
+    test_id, load_model_path, model_save_basedir, logs_dir, timesteps, algo, policy, num_processes, hyper_opt, short_life
 ):
     scores = []
 
@@ -55,7 +55,8 @@ def test(
             logs_path=logs_path,
             hyper_opt=hyper_opt,
             load_model_path=load_model_path,
-            train_counter=i
+            train_counter=i,
+            short_life=short_life
         )
 
         _, score_values = ts2xy(load_results(logs_path), "timesteps")
@@ -90,7 +91,8 @@ if __name__ == "__main__":
         args.algo,
         args.policy,
         args.num_processes,
-        args.hyper_opt
+        args.hyper_opt,
+        not args.no_short_life
     )
     print("\n\nFinal Score: ", score)
     with open(os.path.join(logs_dir, "final_score.txt"), "a") as f:
