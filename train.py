@@ -78,8 +78,9 @@ def train(
     load_model_path=None,
     train_counter=0 # To be set (incrementally) when running multiple trainings
 ):
-    global global_logs_path
+    global global_logs_path, best_mean_reward, n_steps
     global_logs_path = logs_path
+    best_mean_reward, n_steps = -np.inf, 0
     envs = []
     if is_joint:
         envs = [
