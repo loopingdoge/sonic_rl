@@ -35,7 +35,7 @@ def make_sonic_env(game, state, remote_env=False, scale_rew=True, video_dir=''):
     env = WarpFrame(env)
     # if stack:
     #     env = FrameStack(env, 4)
-    env = ShortLife(env)
+    # env = ShortLife(env)
     env = AllowBacktracking(env)
     return env
 
