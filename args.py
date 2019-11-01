@@ -52,13 +52,6 @@ def common_args(parser):
         choices=["cnn", "cnnlstm"],
         help="algorithm to use: cnn | cnnlstm",
     )
-
-    parser.add_argument(
-        "--num-processes",
-        type=int,
-        default=4,
-        help="how many training CPU processes to use (default: 4)",
-    )
     
     parser.add_argument(
         "--hyper-opt",
@@ -83,6 +76,13 @@ def get_test_args():
     common_args(parser)
 
     parser.add_argument("test_id", help="test id (used for the logs' name)")
+    
+    parser.add_argument(
+        "--num-processes",
+        type=int,
+        default=1,
+        help="how many training CPU processes to use (default: 1)",
+    )
 
     return finalize_args(parser)
 
@@ -103,6 +103,13 @@ def get_train_args():
         default="GreenHillZone.Act1",
         help="lebel to train on (default: GreenHillZone.Act1)",
     )
+    
+    parser.add_argument(
+        "--num-processes",
+        type=int,
+        default=4,
+        help="how many training CPU processes to use (default: 4)",
+    )
 
     parser.add_argument(
         "--joint",
@@ -110,6 +117,7 @@ def get_train_args():
         default=False,
         help="train on the full train set",
     )
+    
     parser.add_argument("train_id", help="training id (used for the logs' name)")
 
     return finalize_args(parser)
