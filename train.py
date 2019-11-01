@@ -59,6 +59,7 @@ def callback(_locals, _globals):
                 # Example for saving best model
                 print("Saving new best model")
                 _locals["self"].save(os.path.join(global_logs_path, "best_model.pkl"))
+            _locals["self"].save(os.path.join(global_logs_path, "latest_model.pkl"))
     n_steps += 1
     return True
 
@@ -93,7 +94,7 @@ def train(
                 seed=train_counter * 100,
                 short_life=short_life
             )
-            for i, (game, level) in enumerate(small_train_set)
+            for i, (game, level) in enumerate(train_set)
         ]
     else:
         envs = [
@@ -138,12 +139,12 @@ def train(
                 model = algo(
                     policy,
                     env,
-                    nminibatches=len(envs) * 8,
                     verbose=1,
                     tensorboard_log=logs_path,
-                    n_steps=8192,
-                    learning_rate=2e-5,
-                    ent_coef=0.001,
+                    n_steps=4096,
+                    nminibatches=8,
+                    learning_rate=0.000158,
+                    ent_coef=0.01
                 )
             else:
                 model = PPO2(
@@ -157,7 +158,7 @@ def train(
             model = A2C(policy, env, verbose=1, tensorboard_log=logs_path)
 
     print(f"Starting training for {num_timesteps} timesteps")
-    model.learn(total_timesteps=num_timesteps, callback=callback)
+    model.learn(total_timesteps=num_timesteps, callback=callback, log_interval=1)
     print("Training finished!")
 
     if model_save_path:
