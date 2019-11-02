@@ -27,7 +27,7 @@ from stable_baselines.results_plotter import load_results, ts2xy
 from sonic_util import make_env
 from args import get_train_args
 from levels import small_train_set, train_set, test_set
-from utils import save_plot, check_subfolder_availability
+from utils import save_plot, check_subfolder_availability, log_fun_args
 
 best_mean_reward, n_steps = -np.inf, 0
 global_logs_path = ""
@@ -79,9 +79,14 @@ def train(
     load_model_path=None,
     train_counter=0,  # To be set (incrementally) when running multiple trainings
     short_life=True,
-    backtracking=False
+    backtracking=False,
 ):
     global global_logs_path, best_mean_reward, n_steps
+    
+    print("\n\nStarting training with args:\n")
+    print(log_fun_args(locals()))
+    print("\n")
+    
     global_logs_path = logs_path
     best_mean_reward, n_steps = -np.inf, 0
     envs = []

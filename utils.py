@@ -43,3 +43,16 @@ def subdirs_list(base_dir):
         if os.path.isdir(os.path.join(base_dir, name))
     ]
     return dirs
+
+
+def log_fun_args(args) -> str:
+    log = ""
+    for k, v in args.items():
+        if len(k) < 6:
+            tabs = "\t\t\t"
+        elif len(k) < 14:
+            tabs = "\t\t"
+        else:
+            tabs = "\t"
+        log += f"{k}:{tabs}{v}\n"
+    return log
