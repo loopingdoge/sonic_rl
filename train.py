@@ -79,6 +79,7 @@ def train(
     load_model_path=None,
     train_counter=0,  # To be set (incrementally) when running multiple trainings
     short_life=True,
+    backtracking=False
 ):
     global global_logs_path, best_mean_reward, n_steps
     global_logs_path = logs_path
@@ -92,7 +93,8 @@ def train(
                 rank=i,
                 log_dir=logs_path,
                 seed=train_counter * 100,
-                short_life=short_life
+                short_life=short_life,
+                backtracking=backtracking
             )
             for i, (game, level) in enumerate(small_train_set)
         ]
@@ -104,7 +106,8 @@ def train(
                 rank=i,
                 log_dir=logs_path,
                 seed=train_counter * 100,
-                short_life=short_life
+                short_life=short_life,
+                backtracking=backtracking
             )
             for i in range(num_processes)
         ]

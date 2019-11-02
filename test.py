@@ -57,6 +57,8 @@ def test(
             hyper_opt=hyper_opt,
             load_model_path=load_model_path,
             train_counter=i,
+            short_life=short_life,
+            backtracking=True
         )
 
         _, score_values = ts2xy(load_results(logs_path), "timesteps")

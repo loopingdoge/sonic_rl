@@ -19,16 +19,22 @@ from stable_baselines.bench import Monitor
 import gym_remote.client as grc
 
 
-def make_sonic_env(game, state, remote_env=False, scale_rew=True, video_dir='', short_life=True):
+def make_sonic_env(
+    game,
+    state,
+    remote_env=False,
+    scale_rew=True,
+    video_dir="",
+    short_life=True,
+    backtracking=False,
+):
     """
     Create an environment with some standard wrappers.
     """
     if remote_env:
-        env = grc.RemoteEnv('tmp/sock')
+        env = grc.RemoteEnv("tmp/sock")
     else:
-        env = make(game=game,
-                   state=state,
-                   bk2dir=video_dir)
+        env = make(game=game, state=state, bk2dir=video_dir)
     env = SonicDiscretizer(env)
     if scale_rew:
         env = RewardScaler(env)
@@ -37,10 +43,21 @@ def make_sonic_env(game, state, remote_env=False, scale_rew=True, video_dir='', 
     #     env = FrameStack(env, 4)
     if short_life:
         env = ShortLife(env)
-    env = AllowBacktracking(env)
+    if backtracking:
+        env = AllowBacktracking(env)
     return env
 
-def make_env(game, level, rank=0, seed=0, log_dir=None, wrapper_class=None, short_life=True):
+
+def make_env(
+    game,
+    level,
+    rank=0,
+    seed=0,
+    log_dir=None,
+    wrapper_class=None,
+    short_life=True,
+    backtracking=False,
+):
     """
     Helper function to multiprocess training
     and log the progress.
@@ -50,14 +67,16 @@ def make_env(game, level, rank=0, seed=0, log_dir=None, wrapper_class=None, shor
     :param wrapper: (type) a subclass of gym.Wrapper to wrap the original
                     env with
     """
-    if log_dir is None and log_dir != '':
+    if log_dir is None and log_dir != "":
         log_dir = "/tmp/gym/{}/".format(int(time.time()))
     os.makedirs(log_dir, exist_ok=True)
 
     def _init():
         set_global_seeds(seed + rank)
         # env = gym.make(env_id)
-        env = make_sonic_env(game, level, short_life=short_life)
+        env = make_sonic_env(
+            game, level, short_life=short_life, backtracking=backtracking
+        )
 
         # Dict observation space is currently not supported.
         # https://github.com/hill-a/stable-baselines/issues/321
@@ -80,10 +99,29 @@ class SonicDiscretizer(gym.ActionWrapper):
 
     def __init__(self, env):
         super(SonicDiscretizer, self).__init__(env)
-        buttons = ["B", "A", "MODE", "START", "UP",
-                   "DOWN", "LEFT", "RIGHT", "C", "Y", "X", "Z"]
-        actions = [['LEFT'], ['RIGHT'], ['LEFT', 'DOWN'], ['RIGHT', 'DOWN'], ['DOWN'],
-                   ['DOWN', 'B'], ['B']]
+        buttons = [
+            "B",
+            "A",
+            "MODE",
+            "START",
+            "UP",
+            "DOWN",
+            "LEFT",
+            "RIGHT",
+            "C",
+            "Y",
+            "X",
+            "Z",
+        ]
+        actions = [
+            ["LEFT"],
+            ["RIGHT"],
+            ["LEFT", "DOWN"],
+            ["RIGHT", "DOWN"],
+            ["DOWN"],
+            ["DOWN", "B"],
+            ["B"],
+        ]
         self._actions = []
         for action in actions:
             arr = np.array([False] * 12)
@@ -132,6 +170,7 @@ class AllowBacktracking(gym.Wrapper):
         rew = max(0, self._cur_x - self._max_x)
         self._max_x = max(self._max_x, self._cur_x)
         return obs, rew, done, info
+
 
 class ShortLife(gym.Wrapper):
     def __init__(self, env):
