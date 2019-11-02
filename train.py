@@ -40,8 +40,8 @@ def callback(_locals, _globals):
     :param _globals: (dict)
     """
     global n_steps, best_mean_reward
-    # Print stats every 100 calls
-    if (n_steps + 1) % 100 == 0:
+    # Print stats every 10 calls
+    if (n_steps + 1) % 10 == 0:
         # Evaluate policy training performance
         x, y = ts2xy(load_results(global_logs_path), "timesteps")
         if len(x) > 0:
