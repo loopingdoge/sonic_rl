@@ -34,3 +34,12 @@ def check_subfolder_availability(directory, subdir_name):
         return _find_available_dir_name(directory, subdir_name)
     else:
         return subdir_name
+
+
+def subdirs_list(base_dir):
+    dirs = [
+        name
+        for name in os.listdir(base_dir)
+        if os.path.isdir(os.path.join(base_dir, name))
+    ]
+    return dirs
