@@ -94,7 +94,7 @@ def train(
                 seed=train_counter * 100,
                 short_life=short_life
             )
-            for i, (game, level) in enumerate(train_set)
+            for i, (game, level) in enumerate(small_train_set)
         ]
     else:
         envs = [
@@ -143,7 +143,7 @@ def train(
                     tensorboard_log=logs_path,
                     n_steps=4096,
                     nminibatches=8,
-                    learning_rate=0.000158,
+                    learning_rate=2e-4,
                     ent_coef=0.01
                 )
             else:
