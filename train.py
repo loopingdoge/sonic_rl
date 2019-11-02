@@ -78,7 +78,7 @@ def train(
     hyper_opt,
     load_model_path=None,
     train_counter=0,  # To be set (incrementally) when running multiple trainings
-    short_life=True,
+    short_life=False,
     backtracking=False,
 ):
     global global_logs_path, best_mean_reward, n_steps
@@ -231,7 +231,7 @@ def main():
         load_model_path=load_model_path,
         logs_path=logs_path,
         hyper_opt=args.hyper_opt,
-        short_life=not args.no_short_life,
+        short_life=args.short_life,
     )
 
 

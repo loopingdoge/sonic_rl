@@ -94,7 +94,7 @@ if __name__ == "__main__":
         args.policy,
         args.num_processes,
         args.hyper_opt,
-        not args.no_short_life
+        args.short_life
     )
     print("\n\nFinal Score: ", score)
     

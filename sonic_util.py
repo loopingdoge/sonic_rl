@@ -25,7 +25,7 @@ def make_sonic_env(
     remote_env=False,
     scale_rew=True,
     video_dir="",
-    short_life=True,
+    short_life=False,
     backtracking=False,
 ):
     """
@@ -55,7 +55,7 @@ def make_env(
     seed=0,
     log_dir=None,
     wrapper_class=None,
-    short_life=True,
+    short_life=False,
     backtracking=False,
 ):
     """

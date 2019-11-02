@@ -61,7 +61,7 @@ def common_args(parser):
     )
     
     parser.add_argument(
-        "--no-short-life",
+        "--short-life",
         action="store_true",
         default=False,
         help="whether or not to use ShortLife wrapper"
