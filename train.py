@@ -20,7 +20,7 @@ with warnings.catch_warnings():
 from scipy.interpolate import make_interp_spline, BSpline
 
 from stable_baselines.common.policies import CnnPolicy, CnnLstmPolicy
-from stable_baselines.common.vec_env import VecFrameStack, SubprocVecEnv
+from stable_baselines.common.vec_env import VecFrameStack, SubprocVecEnv, DummyVecEnv
 from stable_baselines import PPO2, A2C
 from stable_baselines.results_plotter import load_results, ts2xy
 
@@ -82,11 +82,11 @@ def train(
     backtracking=False,
 ):
     global global_logs_path, best_mean_reward, n_steps
-    
+
     print("\n\nStarting training with args:\n")
     print(log_fun_args(locals()))
     print("\n")
-    
+
     global_logs_path = logs_path
     best_mean_reward, n_steps = -np.inf, 0
     envs = []
@@ -99,7 +99,7 @@ def train(
                 log_dir=logs_path,
                 seed=train_counter * 100,
                 short_life=short_life,
-                backtracking=backtracking
+                backtracking=backtracking,
             )
             for i, (game, level) in enumerate(small_train_set)
         ]
@@ -112,12 +112,15 @@ def train(
                 log_dir=logs_path,
                 seed=train_counter * 100,
                 short_life=short_life,
-                backtracking=backtracking
+                backtracking=backtracking,
             )
             for i in range(num_processes)
         ]
 
-    env = VecFrameStack(SubprocVecEnv(envs), 4)
+    if num_processes == 1:
+        env = VecFrameStack(DummyVecEnv(envs), 4)
+    else:
+        env = VecFrameStack(SubprocVecEnv(envs), 4)
 
     print("\n\n")
 
@@ -152,7 +155,7 @@ def train(
                     n_steps=4096,
                     nminibatches=8,
                     learning_rate=2e-4,
-                    ent_coef=0.01
+                    ent_coef=0.01,
                 )
             else:
                 model = PPO2(

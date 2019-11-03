@@ -33,8 +33,17 @@ def mcd_id(model_save_path, logs_path, test_id):
         return mcd_id(model_save_path, logs_path, mcid)
 
 
-def test(
-    test_id, load_model_path, model_save_basedir, logs_dir, timesteps, algo, policy, num_processes, hyper_opt, short_life
+def test_sequential(
+    test_id,
+    load_model_path,
+    model_save_basedir,
+    logs_dir,
+    timesteps,
+    algo,
+    policy,
+    num_processes,
+    hyper_opt,
+    short_life,
 ):
     scores = []
 
@@ -58,7 +67,7 @@ def test(
             load_model_path=load_model_path,
             train_counter=i,
             short_life=short_life,
-            backtracking=True
+            backtracking=True,
         )
 
         _, score_values = ts2xy(load_results(logs_path), "timesteps")
@@ -73,19 +82,59 @@ def test(
     return final_score
 
 
+def test_single(
+    test_id,
+    game,
+    level,
+    load_model_path,
+    model_save_basedir,
+    logs_dir,
+    timesteps,
+    algo,
+    policy,
+    num_processes,
+    hyper_opt,
+    short_life,
+    rank,
+):
+    model_save_path = os.path.join(model_save_dir, f"{level}.pkl")
+    logs_path = os.path.join(logs_dir, level)
+
+    train(
+        train_id=test_id,
+        game=game,
+        level=level,
+        num_processes=num_processes,
+        num_timesteps=timesteps,
+        algo_name=algo,
+        policy_name=policy,
+        is_joint=False,
+        model_save_path=model_save_path,
+        logs_path=logs_path,
+        hyper_opt=hyper_opt,
+        load_model_path=load_model_path,
+        train_counter=rank,
+        short_life=short_life,
+        backtracking=True,
+    )
+
+
 if __name__ == "__main__":
     args = get_test_args()
 
     # Find a unique ID
-    new_test_id = mcd_id(args.save_dir, args.logs_dir, args.test_id)
-    logs_dir = os.path.join(args.logs_dir, new_test_id)
-    model_save_dir = os.path.join(args.save_dir, new_test_id)
-    
-    if not os.path.exists(model_save_dir):
-        os.makedirs(model_save_dir)
+    # new_test_id = mcd_id(args.save_dir, args.logs_dir, args.test_id)
+    logs_dir = os.path.join(args.logs_dir, args.test_id)
+    model_save_dir = os.path.join(args.save_dir, args.test_id)
 
-    score = test(
+    os.makedirs(model_save_dir, exist_ok=True)
+
+    (game, level) = test_set[args.rank]
+
+    test_single(
         args.test_id,
+        game,
+        level,
         args.load_model,
         model_save_dir,
         logs_dir,
@@ -94,12 +143,14 @@ if __name__ == "__main__":
         args.policy,
         args.num_processes,
         args.hyper_opt,
-        args.short_life
+        args.short_life,
+        args.rank,
     )
-    print("\n\nFinal Score: ", score)
-    
-    log_scores(logs_dir)
-    print(
-        f"\nCreated scores.csv ({os.path.join(logs_dir, 'scores.csv')})"
-    )
+
+    # print("\n\nFinal Score: ", score)
+
+    # log_scores(logs_dir)
+    # print(
+    #     f"\nCreated scores.csv ({os.path.join(logs_dir, 'scores.csv')})"
+    # )
 

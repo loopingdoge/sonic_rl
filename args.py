@@ -83,6 +83,8 @@ def get_test_args():
         default=1,
         help="how many training CPU processes to use (default: 1)",
     )
+    
+    parser.add_argument("rank", help="rank number", type=int)
 
     return finalize_args(parser)
 
