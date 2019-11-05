@@ -14,6 +14,12 @@ def level_final_score(logs_dir: str) -> int:
     _, score_values = ts2xy(load_results(logs_dir), "timesteps")
     f_score = int(score_values[-1] * 100)
     return f_score
+
+
+def level_best_score(logs_dir: str) -> int:
+    _, score_values = ts2xy(load_results(logs_dir), "timesteps")
+    b_score = int(score_values.max() * 100)
+    return b_score
     
 
 def level_score(logs_dir: str) -> float:
@@ -34,15 +40,17 @@ def log_scores(logs_base_dir: str):
     dirs = subdirs_list(logs_base_dir)
     scores = list(map(lambda d: level_score(os.path.join(logs_base_dir, d)), dirs))
     final_scores = list(map(lambda d: level_final_score(os.path.join(logs_base_dir, d)), dirs))
-    dir_score_tuple = zip(dirs, scores, final_scores)
+    best_scores = list(map(lambda d: level_best_score(os.path.join(logs_base_dir, d)), dirs))
+    dir_score_tuple = zip(dirs, scores, final_scores, best_scores)
     score = mean_score(scores)
     f_mean_score = mean_score(final_scores)
+    b_mean_score = mean_score(best_scores)
 
     with open(os.path.join(logs_base_dir, scores_filename), "w") as f:
-        f.write("Level, Mean Score, Final Score\n")
-        for (d, m_score, f_score) in dir_score_tuple:
-            f.write(f"{d},{m_score},{f_score}\n")
-        f.write(f"Final score,{score},{f_mean_score}")
+        f.write("Level,Mean Score,Final Score,Best Score\n")
+        for (d, m_score, f_score, b_score) in dir_score_tuple:
+            f.write(f"{d},{m_score},{f_score},{b_score}\n")
+        f.write(f"Final score,{score},{f_mean_score},{b_mean_score}")
 
 
 def main():
